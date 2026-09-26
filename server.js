@@ -223,9 +223,12 @@ $targetHwnd = [IntPtr]::Zero
 
 $procs = Get-Process | Where-Object { 
     $_.ProcessName -eq "AisakaStudio" -or
+    $_.ProcessName -eq "RobloxStudioBeta" -or
     $_.ProcessName -like "*RobloxStudio*" -or
+    $_.ProcessName -like "*Octane*" -or
     $_.MainWindowTitle -like "*Roblox Studio*" -or 
-    $_.MainWindowTitle -like "*Aisaka*"
+    $_.MainWindowTitle -like "*Aisaka*" -or
+    $_.MainWindowTitle -like "*Octane*"
 }
 
 if ($procs) {
@@ -300,9 +303,12 @@ public class WinUserPlaytest {
 "@
 $procs = Get-Process | Where-Object { 
     $_.ProcessName -eq "AisakaStudio" -or
+    $_.ProcessName -eq "RobloxStudioBeta" -or
     $_.ProcessName -like "*RobloxStudio*" -or
+    $_.ProcessName -like "*Octane*" -or
     $_.MainWindowTitle -like "*Roblox Studio*" -or 
-    $_.MainWindowTitle -like "*Aisaka*"
+    $_.MainWindowTitle -like "*Aisaka*" -or
+    $_.MainWindowTitle -like "*Octane*"
 }
 if ($procs) {
     $proc = $procs[0]

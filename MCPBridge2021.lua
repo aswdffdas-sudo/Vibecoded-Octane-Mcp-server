@@ -9,7 +9,15 @@ local LogService = game:GetService("LogService")
 
 local BRIDGE_URL = "http://127.0.0.1:3021"
 local sleep = (task and task.wait) or wait
-local spawnThread = (task and task.spawn) or spawn
+
+local function spawnThread(fn)
+    local co = coroutine.create(fn)
+    local ok, err = coroutine.resume(co)
+    if not ok then
+        warn("[MCP 2021] Coroutine error: " .. tostring(err))
+    end
+    return co
+end
 
 -- Auto-enable HttpService and LoadString so users never have to configure settings manually
 pcall(function()
