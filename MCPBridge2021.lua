@@ -157,7 +157,7 @@ end
 -- Handlers for MCP tool requests
 local Handlers = {}
 
--- 1. Execute Luau with Safety Scanner & Coroutine Watchdog
+-- 1. Execute Luau with Safety Scanner
 Handlers["execute_luau"] = function(args)
     local code = args.code
     if not code or code == "" then
@@ -176,37 +176,22 @@ Handlers["execute_luau"] = function(args)
     end
 
     ChangeHistoryService:SetWaypoint("MCP_ExecuteBefore")
-
-    -- 2. Execute within a monitored coroutine
-    local co = coroutine.create(fn)
-    local startTime = tick()
-    local maxExecutionTime = 8.0 -- seconds
-
-    local ok, res1, res2 = coroutine.resume(co)
-    if not ok then
-        ChangeHistoryService:SetWaypoint("MCP_ExecuteAfter")
-        error(tostring(res1))
-    end
-
-    -- If the coroutine completed synchronously
-    if coroutine.status(co) == "dead" then
-        ChangeHistoryService:SetWaypoint("MCP_ExecuteAfter")
-        if res1 ~= nil then
-            return tostring(res1)
-        end
-        return "Executed successfully"
-    end
-
-    -- If the coroutine yielded (e.g. wait or WaitForChild), monitor with a watchdog loop
-    while coroutine.status(co) ~= "dead" do
-        if tick() - startTime > maxExecutionTime then
-            ChangeHistoryService:SetWaypoint("MCP_ExecuteAfter")
-            error(string.format("Execution timed out after %.1fs (code yielded indefinitely or got stuck in a long loop)", maxExecutionTime))
-        end
-        sleep(0.05)
-    end
-
+    local results = table.pack(pcall(fn))
     ChangeHistoryService:SetWaypoint("MCP_ExecuteAfter")
+
+    local ok = results[1]
+    if not ok then
+        error(tostring(results[2]))
+    end
+
+    if results.n > 1 then
+        local outputs = {}
+        for i = 2, results.n do
+            table.insert(outputs, tostring(results[i]))
+        end
+        return table.concat(outputs, "\t")
+    end
+
     return "Executed successfully"
 end
 
