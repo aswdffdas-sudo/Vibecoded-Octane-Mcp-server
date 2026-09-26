@@ -163,6 +163,29 @@ if errorlevel 1 (
 echo         OK
 call :log "websockets library OK"
 
+REM --- 2.5 Check Node.js & dependencies ---------------------------------------
+where node >nul 2>nul
+if errorlevel 1 (
+    echo.
+    echo   ERROR: Node.js is not installed.
+    echo   Install Node.js to run the MCP server: https://nodejs.org
+    echo.
+    call :log "FATAL: node.exe not found on PATH."
+    pause
+    exit /b 1
+)
+
+if not exist "%~dp0node_modules" (
+    echo.
+    echo   [2.5] Installing Node dependencies ^(first time only^)...
+    call npm install
+    if errorlevel 1 (
+        echo   ERROR: npm install failed.
+        pause
+        exit /b 1
+    )
+)
+
 REM --- 3. Run the bridge ------------------------------------------------------
 echo.
 echo   [3/3] Starting bridge...

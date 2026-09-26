@@ -1,17 +1,19 @@
 # 2021 Roblox Studio MCP Bridge 🎮🤖
 
-Connect AI coding assistants (**OpenCode**, **Claude Desktop / Claude Code**, **Cursor**, **Codex**, **Windsurf**, **Gemini CLI**) directly to **2021 Roblox Studio / Aisaka Studio** using Anthropic's **Model Context Protocol (MCP)**.
+Connect AI coding assistants (**OpenCode**, **Claude Desktop / Claude Code**, **Cursor**, **Codex**, **Windsurf**, **Gemini CLI**, and browser AIs via **ZeroScript**) directly to **2021 Roblox Studio (Octane / Aisaka)** using Anthropic's **Model Context Protocol (MCP)**.
 
 ---
 
 ## 🌟 Features
 
-- **`screen_capture`**: Captures a screenshot of the 2021 Roblox Studio / Aisaka window directly into the AI's chat context so vision models can see your viewport, models, and GUIs!
-- **`execute_luau`**: Executes arbitrary Luau code in edit mode with automatic `ChangeHistoryService` undo checkpoints.
-- **`read_script` & `write_script`**: Reads and overwrites the complete source code of scripts, local scripts, and module scripts.
-- **`get_tree`**: Explores the DataModel hierarchy (`Workspace`, `StarterGui`, `ServerScriptService`, etc.).
-- **`create_instance` & `delete_instance`**: Creates parts, models, or GUIs with custom properties, or deletes objects.
-- **`get_output_log`**: Retrieves recent console messages from Studio.
+- **`screen_capture`**: Captures high-res screenshots of your Studio viewport/GUI directly into the AI chat.
+- **`execute_luau`**: Executes arbitrary Luau code in Studio edit mode with automatic `ChangeHistoryService` undo checkpoints.
+- **`read_script` & `write_script`**: Reads and overwrites the full source code of scripts, local scripts, and module scripts.
+- **`script_grep`**: Global regex search across all scripts in the place.
+- **`inspect_instance`**: Deep property inspector (CFrames, colors, attributes, tags, children).
+- **`audit_scene_assets`**: Scans all 3D scene objects (sounds, meshes, decals, particles, clothing) for asset IDs.
+- **Playtest Suite (`run_playtest`, `start_playtest`, `stop_playtest`)**: Autonomous AI playtesting with gameplay screenshots and console error diagnostics.
+- **Stability Suite**: HTTP Long-Polling (94% less traffic), Studio heartbeat tracking, infinite-loop guard, and UTF-8 sanitization.
 
 ---
 
@@ -24,12 +26,12 @@ Connect AI coding assistants (**OpenCode**, **Claude Desktop / Claude Code**, **
    ```
    and press **Enter**.
 2. Copy **`MCPBridge2021.lua`** into that folder.
-3. Open **2021 Roblox Studio**.
-4. Go to **Game Settings** > **Security** and turn ON **Allow HTTP Requests** (or run `game:GetService("HttpService").HttpEnabled = true` in the Command Bar).
-5. Check your Output window in Studio; you should see:
+3. Open **2021 Roblox Studio** (Octane).
+4. Check your Output window in Studio; you should see:
    ```text
    [MCP 2021] Bridge initialized. Connecting to http://127.0.0.1:3021 ...
    ```
+   *(Note: The plugin automatically enables `HttpService` on launch).*
 
 ---
 
