@@ -702,80 +702,68 @@ toggleButton.Click:Connect(function()
     end
 end)
 
--- Main Polling Loop
-spawnThread(function()
-    print("[MCP 2021] Bridge initialized. Connecting to " .. BRIDGE_URL .. " ...")
-    local consecutiveFailures = 0
+-- Main Polling Loop driven by RunService.Heartbeat (runs continuously in Studio Edit mode)
+local RunService = game:GetService("RunService")
+local isPolling = false
+local lastPollTime = 0
+local consecutiveFailures = 0
 
-    while true do
-        if isRunning then
-            local requestSuccess, response = pcall(function()
-                return HttpService:RequestAsync({
-                    Url = BRIDGE_URL .. "/poll",
-                    Method = "GET",
-                    Headers = {
-                        ["Content-Type"] = "application/json"
-                    }
-                })
+print("[MCP 2021] Bridge initialized. Connecting to " .. BRIDGE_URL .. " ...")
+
+RunService.Heartbeat:Connect(function()
+    if not isRunning or isPolling then return end
+
+    local now = tick()
+    if now - lastPollTime < 0.25 then return end
+
+    isPolling = true
+    lastPollTime = now
+
+    coroutine.wrap(function()
+        local requestSuccess, response = pcall(function()
+            return HttpService:GetAsync(BRIDGE_URL .. "/poll")
+        end)
+
+        if requestSuccess and response and #response > 0 and response ~= "null\n" and response ~= "[]\n" and response ~= "[]" then
+            consecutiveFailures = 0
+
+            local decodeSuccess, data = pcall(function()
+                return HttpService:JSONDecode(response)
             end)
 
-            if requestSuccess and response then
-                consecutiveFailures = 0
+            if decodeSuccess and data and data.tool then
+                local handler = Handlers[data.tool]
+                local toolSuccess, toolResult
 
-                -- 200 OK means there is a task pending
-                if response.StatusCode == 200 and response.Body and #response.Body > 0 then
-                    local decodeSuccess, data = pcall(function()
-                        return HttpService:JSONDecode(response.Body)
-                    end)
-
-                    if decodeSuccess and data and data.tool then
-                        local handler = Handlers[data.tool]
-                        local toolSuccess, toolResult
-
-                        if handler then
-                            toolSuccess, toolResult = pcall(handler, data.args or {})
-                        else
-                            toolSuccess = false
-                            toolResult = "No handler registered for tool: " .. tostring(data.tool)
-                        end
-
-                        -- Return response back to the local MCP server with safe JSON encoding & size capping
-                        pcall(function()
-                            local responseBody = safeJsonEncode({
-                                id = data.id,
-                                success = toolSuccess,
-                                result = toolSuccess and toolResult or nil,
-                                error = (not toolSuccess) and tostring(toolResult) or nil
-                            })
-                            HttpService:RequestAsync({
-                                Url = BRIDGE_URL .. "/respond",
-                                Method = "POST",
-                                Headers = {
-                                    ["Content-Type"] = "application/json"
-                                },
-                                Body = responseBody
-                            })
-                        end)
-                    end
+                if handler then
+                    toolSuccess, toolResult = pcall(handler, data.args or {})
+                else
+                    toolSuccess = false
+                    toolResult = "No handler registered for tool: " .. tostring(data.tool)
                 end
 
-                -- Long-poll loop: minimal yield (0.02s) because server holds the request when idle
-                sleep(0.02)
-            else
+                pcall(function()
+                    local responseBody = safeJsonEncode({
+                        id = data.id,
+                        success = toolSuccess,
+                        result = toolSuccess and toolResult or nil,
+                        error = (not toolSuccess) and tostring(toolResult) or nil
+                    })
+                    HttpService:PostAsync(BRIDGE_URL .. "/respond", responseBody)
+                end)
+            end
+        else
+            if not requestSuccess then
                 consecutiveFailures = consecutiveFailures + 1
-                -- Auto-recover: ensure HttpService stays enabled
+                if consecutiveFailures == 1 or consecutiveFailures % 25 == 0 then
+                    print("[MCP 2021] Poll notice: " .. tostring(response))
+                end
                 pcall(function()
                     HttpService.HttpEnabled = true
                 end)
-                -- Back off when server is offline
-                if consecutiveFailures > 2 then
-                    sleep(1.0)
-                else
-                    sleep(0.5)
-                end
             end
-        else
-            sleep(0.5)
         end
-    end
+
+        isPolling = false
+    end)()
 end)
