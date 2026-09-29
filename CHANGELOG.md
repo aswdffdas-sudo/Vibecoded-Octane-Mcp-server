@@ -1,6 +1,18 @@
 # Changelog
 
-All notable changes to the Aisaka 2021 Roblox Studio MCP Bridge & ZeroScript Extension are documented here.
+All notable changes to the Octane 2021 Roblox Studio MCP Bridge & ZeroScript Extension are documented here.
+
+## [1.5.6] - 2026-09-17
+
+### Added
+- **Claude (`claude.ai`) Browser Extension Integration**:
+  - Added native ZeroScript content script provider (`providers/claude.js`) supporting `https://claude.ai/*`.
+  - Injects interactive status bar, command monitoring, and execution chips into Claude web chats.
+- **Bridge & Extension v1.5.6 Sync**:
+  - Synchronized extension manifest and bridge version to `v1.5.6`.
+  - Preserved Octane Studio process and window title detection.
+
+---
 
 ## [1.5.5] - 2026-09-13
 

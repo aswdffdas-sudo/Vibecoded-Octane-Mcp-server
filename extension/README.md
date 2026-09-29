@@ -1,8 +1,8 @@
-# ZeroScript Free - AI Roblox Studio Agent (ChatGPT, DeepSeek, Gemini, Kimi, GLM, Qwen, Arena, Meta AI)
+# ZeroScript Free - AI Roblox Studio Agent (Claude, ChatGPT, DeepSeek, Gemini, Kimi, GLM, Qwen, Arena, Meta AI)
 
-Control Roblox Studio with AI, for free. ZeroScript turns a normal AI chat (ChatGPT, DeepSeek, Google Gemini, Kimi, GLM, Qwen, Arena, or Meta AI) into an agent that builds and scripts your Roblox game for you: just describe what you want, and it reads/edits scripts, runs Luau, inspects the game tree, and generates assets directly in Roblox Studio. No API key, no terminal, no coding required.
+Control Roblox Studio with AI, for free. ZeroScript turns a normal AI chat (Claude, ChatGPT, DeepSeek, Google Gemini, Kimi, GLM, Qwen, Arena, or Meta AI) into an agent that builds and scripts your Roblox game for you: just describe what you want, and it reads/edits scripts, runs Luau, inspects the game tree, and generates assets directly in Roblox Studio. No API key, no terminal, no coding required.
 
-It's a Chrome/Edge browser extension plus a small local bridge that connects the chat to Roblox Studio through the official MCP server. **DeepSeek is the recommended provider.** ChatGPT, Gemini, Kimi, GLM, Qwen, Arena and Meta AI also work. On ChatGPT, screenshots and image input are disabled on purpose (its free tier caps files/images on a separate quota from messages, so vision would only work part of the day); ChatGPT also summarises its own context in long sessions, so ZeroScript re-states its operating instructions periodically (shown as a "Reminder" chip) to stop it forgetting it can run commands. Gemini and Kimi can be less stable: Gemini tends to stop using the Roblox tools in long sessions, and Kimi sometimes reaches for its own native tools instead of the Roblox commands. On Arena, keep the mode dropdown on **Direct** (ZeroScript only supports Direct mode).
+It's a Chrome/Edge browser extension plus a small local bridge that connects the chat to Roblox Studio through the official MCP server. **Claude and DeepSeek are recommended providers.** ChatGPT, Gemini, Kimi, GLM, Qwen, Arena and Meta AI also work. Claude uses a friendly MCP bridge prompt to ensure clean tool calling without safety refusals. On ChatGPT, screenshots and image input are disabled on purpose (its free tier caps files/images on a separate quota from messages, so vision would only work part of the day); ChatGPT also summarises its own context in long sessions, so ZeroScript re-states its operating instructions periodically (shown as a "Reminder" chip) to stop it forgetting it can run commands. Gemini and Kimi can be less stable: Gemini tends to stop using the Roblox tools in long sessions, and Kimi sometimes reaches for its own native tools instead of the Roblox commands. On Arena, keep the mode dropdown on **Direct** (ZeroScript only supports Direct mode).
 
 ## Setup
 
@@ -18,7 +18,7 @@ It's a Chrome/Edge browser extension plus a small local bridge that connects the
 2. **Open Roblox Studio** and load a Place
 3. **Enable the MCP server in Roblox Studio** (first time only): click **Assistant AI** in the top bar, then **...** > **Manage MCP Servers** > **Enable Studio as MCP Server**
 4. **Run the Bridge** - double-click `start.bat` (Windows) or `MacOS_Start.command` (macOS); a small window opens, the Bridge is running. On macOS, the first launch shows a Gatekeeper warning (normal for any downloaded script): click **Done**, then **System Settings > Privacy & Security**, scroll down, and click **Open Anyway**.
-5. **Go to https://chat.deepseek.com** (recommended), https://chatgpt.com, https://gemini.google.com, https://www.kimi.com, https://chat.z.ai, https://chat.qwen.ai, https://arena.ai, or https://www.meta.ai, open a new chat (only works on these exact addresses; on Arena use Direct mode)
+5. **Go to https://claude.ai** (recommended), https://chat.deepseek.com, https://chatgpt.com, https://gemini.google.com, https://www.kimi.ai, https://chat.z.ai, https://chat.qwen.ai, https://arena.ai, or https://www.meta.ai, open a new chat (only works on these exact addresses; on Arena use Direct mode)
 6. Click **Start session** in the ZeroScript panel
 7. Type what you want to build
 
@@ -32,6 +32,8 @@ The extension is split between a provider-agnostic core and per-AI-site provider
 core/config.js        system prompt, feedback strings, tool categories (global ZS)
 core/parser.js        ZeroScript command parsing - pure string logic   (global ZSParse)
 core/main.js          agentic loop, UI, camouflage, session state      (uses ZSProvider)
+providers/claude.js   same interface for Claude / claude.ai (React DOM,
+                      ProseMirror composer, friendly MCP bridge prompt) (global ZSProvider)
 providers/deepseek.js everything DeepSeek-specific: DOM selectors, generation
                       detection, send mechanics, composer modes…       (global ZSProvider)
 providers/gemini.js   same interface for Google Gemini (Angular DOM, Quill
@@ -64,6 +66,7 @@ background.js         WebSocket to the local bridge (provider-agnostic)
 Smoke tests (plain Node, no dependencies - run them from this directory):
 
 - `node test-parser.js` - the command parser (`core/parser.js`).
+- `node test-claude.js` - Claude provider (`providers/claude.js`) and friendly MCP prompt.
 - `node test-chatgpt.js` - ChatGPT reply reading (`providers/chatgpt.js`),
   driven against a stub DOM: CodeMirror line joining, the `data-zs-cm`
   MAIN-world tap that long code blocks depend on, and subtree exclusion.

@@ -104,6 +104,7 @@
   const AI_SITES = [
     { name: "DeepSeek", url: "https://chat.deepseek.com/" },
     { name: "ChatGPT", url: "https://chatgpt.com/" },
+    { name: "Claude", url: "https://claude.ai/new" },
     { name: "Gemini", url: "https://gemini.google.com/app" },
     { name: "Kimi", url: "https://www.kimi.ai/" },
     { name: "GLM", url: "https://chat.z.ai/" },
@@ -1635,8 +1636,19 @@
   // definition, used both by the bootstrap and by the periodic re-injection, so
   // the two can never drift apart.
   function systemPrompt() {
+    if (typeof P.buildSystemPrompt === "function") {
+      return P.buildSystemPrompt({
+        siteName: P.displayName,
+        providerId: P.id,
+        friendly: !!P.friendlyPrompt,
+        customPrompt: ui.getCustomPrompt(),
+        providerNotes: P.promptExtra || "",
+      });
+    }
     return ZS.buildSystemPrompt({
       siteName: P.displayName,
+      providerId: P.id,
+      friendly: !!P.friendlyPrompt,
       customPrompt: ui.getCustomPrompt(),
       providerNotes: P.promptExtra || "",
     });

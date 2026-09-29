@@ -110,7 +110,7 @@ app.get("/api/status", (req, res) => {
   res.json({
     ok: true,
     server: "Aisaka 2021 Roblox Studio MCP",
-    version: "1.5.5-retro",
+    version: "1.5.6-retro",
     studioConnected: isStudioAlive,
     lastHeartbeatSec: lastStudioPollTime > 0 ? Math.round((Date.now() - lastStudioPollTime) / 1000) : null,
     port: PORT,
@@ -484,7 +484,7 @@ ${typeof logs === "string" ? logs.split("\n").slice(-15).join("\n") : ""}`;
 const server = new Server(
   {
     name: "roblox-2021-studio",
-    version: "1.5.5",
+    version: "1.5.6",
   },
   {
     capabilities: {

@@ -557,6 +557,22 @@ message-content.zs-cmd-mask code-block { display: none !important; }
    viewer widget or a plain <pre>) hidden with no flash. Inert elsewhere. */
 .zs-cmd-mask .ur-code-block { display: none !important; }
 
+/* Claude (claude.ai, React): React recreates the reply's rendered code subtree
+   on stream settle, wiping any per-element .zs-tool-hide class. Only hide the
+   <pre> elements carrying commands, never the parent content wrappers. */
+.font-claude-message.zs-cmd-mask pre.zs-tool-hide,
+[data-testid="assistant-message"].zs-cmd-mask pre.zs-tool-hide,
+.font-claude-message.zs-cmd-mask pre:has(code),
+[data-testid="assistant-message"].zs-cmd-mask pre:has(code) { display: none !important; }
+
+#zs-bar.zs-prov-claude {
+  font-family: inherit;
+}
+#zs-bar.zs-bar-inline.zs-bar-inside.zs-prov-claude {
+  margin: 0 0 8px;
+  width: 100%;
+}
+
 /* Meta AI whole-turn chips (result / sys) alignment. A whole:true chip is pinned
    as a direct child of the TURN ROOT, but Meta's turn root is FULL width (~1608px)
    while the reply body lives in a nested `mx-auto max-w-3xl` (768px) centered
